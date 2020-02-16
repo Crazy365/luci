@@ -59,11 +59,12 @@
 		luci.sys.exec("/bin/getcpu &")
 
 		local rv = {
-			cpuusage    = cpu_usage,
-			userinfo    = user_info,
+			cpuusage   = cpu_usage,
+			userinfo   = user_info,
 			uptime     = sysinfo.uptime or 0,
 			localtime  = os.date(),
 			loadavg    = sysinfo.load or { 0, 0, 0 },
+			cputemp    = luci.sys.exec("cut -c1-2 /sys/class/thermal/thermal_zone0/temp"),
 			memory     = meminfo,
 			memcached  = mem_cached,
 			swap       = swapinfo,
@@ -651,6 +652,9 @@
 				
 			if (e = document.getElementById('cpuusage'))
 				e.innerHTML = info.cpuusage;
+				
+			if (e = document.getElementById('cputemp'))
+				e.innerHTML = String.format('%d',info.cputemp);
 
 			if (e = document.getElementById('loadavg'))
 				e.innerHTML = String.format(
@@ -705,6 +709,7 @@
 			<%=pcdata(ver.luciname)%> (<%=pcdata(ver.luciversion)%>)
 		</td></tr>
 		<tr><td width="33%"><%:Kernel Version%></td><td><%=unameinfo.release or "?"%></td></tr>
+		<tr><td width="33%"><%:CPU Temperature%></td><td id="cputemp">-</td></tr>
 		<tr><td width="33%"><%:Local Time%></td><td id="localtime">-</td></tr>
 		<tr><td width="33%"><%:Uptime%></td><td id="uptime">-</td></tr>
 		<tr><td width="33%"><%:Load Average%></td><td id="loadavg">-</td></tr>
@@ -811,6 +816,24 @@
 
 	<table id="wifi_status_table" width="100%" cellspacing="10">
 		<tr><td><em><%:Collecting data...%></em></td></tr>
+	</table>
+</fieldset>
+
+<fieldset class="cbi-section">
+	<legend><%:Associated Stations%></legend>
+
+	<table class="cbi-section-table valign-middle" id="wifi_assoc_table">
+		<tr class="cbi-section-table-titles">
+			<th class="cbi-section-table-cell">&#160;</th>
+			<th class="cbi-section-table-cell"><%:Network%></th>
+			<th class="cbi-section-table-cell"><%:MAC-Address%></th>
+			<th class="cbi-section-table-cell"><%:Host%></th>
+			<th class="cbi-section-table-cell"><%:Signal%> / <%:Noise%></th>
+			<th class="cbi-section-table-cell"><%:RX Rate%> / <%:TX Rate%></th>
+		</tr>
+		<tr class="cbi-section-table-row">
+			<td colspan="6"><em><br /><%:Collecting data...%></em></td>
+		</tr>
 	</table>
 </fieldset>
 <% end %>
